@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { useEffect } from 'react';
 import DraggableProjectBoard from './draggable-project-board';
+import EyeFollowButton from './eye-follow-button';
 import type { Project } from './portfolio-data';
 
 type ExperienceItem = {
@@ -69,21 +70,12 @@ export default function NonlinearPortfolioCanvas({
       <div className="canvas-viewport">
         <div className="canvas-world">
           <article className="node-hero" id="home">
-            <div className="hero-spotlight" aria-hidden="true" />
-            <p className="canvas-eyebrow">Frontend Developer • Freelance Webflow + Next.js</p>
+            <p className="canvas-eyebrow">Frontend Developer</p>
             <h1 className="canvas-title">I craft high-performance websites with premium interaction and motion.</h1>
             <p className="canvas-copy">
-              Freelancer building conversion-ready experiences with Webflow, Next.js, Three.js, GSAP, and custom
-              animation systems.
+              Building conversion-ready experiences with Webflow, Three.js, GSAP, and custom animation systems.
             </p>
-            <div className="hero-skill-row">
-              <span>Webflow</span>
-              <span>Next.js</span>
-              <span>Three.js</span>
-              <span>GSAP</span>
-              <span>Custom Animation</span>
-              <span>{profile.yearsExperience}</span>
-            </div>
+            <EyeFollowButton href={`mailto:${profile.email}`} label="Get in touch" />
           </article>
 
           <article className="node-projects" id="projects">

@@ -15,9 +15,14 @@ export default function HomePage() {
     <main>
       <div className="grain" />
 
-      <div className="top-theme-button">
+      <header className="floating-center-nav" aria-label="Primary">
+        <nav>
+          <a href="#projects">Projects</a>
+          <a href="#about">About Me</a>
+          <a href="#contact">Contact</a>
+        </nav>
         <ThemeToggle />
-      </div>
+      </header>
 
       <NonlinearPortfolioCanvas
         profile={profile}
