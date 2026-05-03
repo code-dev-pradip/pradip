@@ -1,4 +1,6 @@
+import KentoBackground from './kento-background';
 import NonlinearPortfolioCanvas from './nonlinear-portfolio-canvas';
+import RevealAnimations from './reveal-animations';
 import ThemeToggle from './theme-toggle';
 import {
   certifications,
@@ -13,6 +15,8 @@ import {
 export default function HomePage() {
   return (
     <main>
+      <KentoBackground />
+      <RevealAnimations />
       <div className="grain" />
 
       <header className="floating-center-nav" aria-label="Primary">

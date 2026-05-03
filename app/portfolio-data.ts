@@ -23,17 +23,22 @@ export const socials = [
   {
     name: 'LinkedIn',
     href: 'https://www.linkedin.com/in/pradip-bathwar-21023a242',
-    icon: '/images/webflow/6883231dbd1e47cda967005b_icons8-linkedin-96.avif'
+    icon: ''
   },
   {
     name: 'Dribbble',
     href: 'https://dribbble.com/pradipbathwar',
-    icon: '/images/webflow/688322fa6e72bbc55891d159_icons8-dribbble-96.avif'
+    icon: ''
   },
   {
-    name: 'Behance',
-    href: 'https://www.behance.net/c682d400',
-    icon: '/images/webflow/688322c921236816b95cf599_icons8-behance-96.avif'
+    name: 'GitHub',
+    href: 'https://github.com/code-dev-pradip',
+    icon: ''
+  },
+  {
+    name: 'Call',
+    href: 'tel:+919082638708',
+    icon: ''
   }
 ];
 
@@ -60,7 +65,8 @@ export const tools = [
   'Notion',
   'Slack',
   'Webflow Designer',
-  'React Ecosystem'
+  'React',
+  'Next.js'
 ];
 
 export const projects: Project[] = [

@@ -35,7 +35,13 @@ function getTouchPoint(event: TouchEvent) {
   return { x: touch.clientX, y: touch.clientY };
 }
 
-export default function DraggableProjectBoard({ projects }: { projects: Project[] }) {
+export default function DraggableProjectBoard({
+  projects,
+  visibilityTargetId
+}: {
+  projects: Project[];
+  visibilityTargetId?: string;
+}) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
   const [dropStarted, setDropStarted] = useState(false);
@@ -106,6 +112,12 @@ export default function DraggableProjectBoard({ projects }: { projects: Project[
       }, 1220);
     };
 
+    const visibilityTarget =
+      (visibilityTargetId ? document.getElementById(visibilityTargetId) : null) ??
+      board.closest('.node-projects') ??
+      board;
+    const rootScroller = board.closest('.canvas-viewport');
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -113,10 +125,13 @@ export default function DraggableProjectBoard({ projects }: { projects: Project[
           observer.disconnect();
         }
       },
-      { threshold: 0.25 }
+      {
+        root: rootScroller,
+        threshold: 0.5
+      }
     );
 
-    observer.observe(board);
+    observer.observe(visibilityTarget);
 
     return () => {
       observer.disconnect();
@@ -125,7 +140,7 @@ export default function DraggableProjectBoard({ projects }: { projects: Project[
         settleTimerRef.current = null;
       }
     };
-  }, []);
+  }, [visibilityTargetId]);
 
   useEffect(() => {
     const board = boardRef.current;
@@ -327,6 +342,8 @@ export default function DraggableProjectBoard({ projects }: { projects: Project[
                     src={card.project.image}
                     alt={card.project.name}
                     fill
+                    priority
+                    loading="eager"
                     sizes="92vw"
                     style={{ objectFit: 'cover', objectPosition: 'top center' }}
                     draggable={false}
@@ -382,6 +399,8 @@ export default function DraggableProjectBoard({ projects }: { projects: Project[
                     src={card.project.image}
                     alt={card.project.name}
                     fill
+                    priority={index < 4}
+                    loading="eager"
                     sizes="(max-width: 920px) 88vw, 300px"
                     style={{ objectFit: 'cover', objectPosition: 'top center' }}
                     draggable={false}
