@@ -41,6 +41,15 @@ export default function RevealAnimations() {
     const prevViewportOverflowY = canvasViewport?.style.overflowY ?? '';
     const prevViewportTouchAction = canvasViewport?.style.touchAction ?? '';
     const shouldLockScroll = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const isTouchOrTablet = window.matchMedia(
+      '(max-width: 1200px), (hover: none), (pointer: coarse)'
+    ).matches;
+    const hasInnerScroller = Boolean(
+      canvasViewport &&
+        getComputedStyle(canvasViewport).overflowY !== 'visible' &&
+        canvasViewport.scrollHeight > canvasViewport.clientHeight + 2
+    );
+    const observerRoot = hasInnerScroller ? canvasViewport : null;
 
     type SplitTextEntry = {
       el: HTMLElement;
@@ -174,10 +183,10 @@ export default function RevealAnimations() {
       const centerX = heroRect.width * 0.5;
       const rightX = heroRect.width - xPad;
 
-      const topMin = navBottom + chipHalfH + 18;
-      const topY = Math.max(topMin, heroRect.height * 0.22);
+      const topMin = navBottom + chipHalfH + 8;
+      const topY = Math.max(topMin, heroRect.height * 0.12);
       const bottomMax = heroRect.height - chipHalfH - 18;
-      const bottomY = Math.min(bottomMax, heroRect.height * 0.84);
+      const bottomY = Math.min(bottomMax, heroRect.height * 0.9);
 
       return [
         { x: leftX, y: topY },
@@ -307,6 +316,55 @@ export default function RevealAnimations() {
       };
 
       chipLoopDelays.push(gsap.delayedCall(delay, run));
+    };
+
+    const startMobileChipSequence = () => {
+      if (visibleHeroChips.length === 0) return;
+      let sequenceIndex = 0;
+
+      const run = () => {
+        const chipIndex = sequenceIndex % visibleHeroChips.length;
+        const chip = visibleHeroChips[chipIndex];
+        const point = getRandomHeroPoint(chip, chipIndex);
+        activeChipPositions[chipIndex] = { x: point.localX, y: point.localY };
+
+        gsap.set(chip, {
+          x: point.x,
+          y: point.y,
+          scale: 0.86,
+          autoAlpha: 0,
+          filter: 'blur(5px)'
+        });
+
+        const popTl = gsap.timeline({
+          defaults: { ease: 'power2.out' },
+          onComplete: () => {
+            activeChipPositions[chipIndex] = null;
+            sequenceIndex += 1;
+            chipLoopDelays.push(gsap.delayedCall(0.18, run));
+          }
+        });
+
+        popTl
+          .to(chip, {
+            autoAlpha: 1,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.72
+          })
+          .to(chip, {
+            autoAlpha: 0,
+            scale: 0.88,
+            filter: 'blur(3px)',
+            duration: 0.78,
+            delay: 1.18,
+            ease: 'power2.in'
+          });
+
+        chipLoopTimelines.push(popTl);
+      };
+
+      run();
     };
 
     const playReveal = () => {
@@ -442,10 +500,13 @@ export default function RevealAnimations() {
         for (const node of heroMainNodes) {
           gsap.set(node, { '--orbit-radius-current': '0px', '--tech-angle-current': '0deg' });
         }
-        visibleHeroChips.forEach((chip, index) => {
-          const isMobile = window.matchMedia('(max-width: 920px)').matches;
-          spawnChipPopLoop(chip, index * (isMobile ? 0.62 : 0.36), index);
-        });
+        if (isTouchOrTablet) {
+          startMobileChipSequence();
+        } else {
+          visibleHeroChips.forEach((chip, index) => {
+            spawnChipPopLoop(chip, index * 0.36, index);
+          });
+        }
       }, '-=0.16');
 
       timeline.set(visibleHeroChips, { clearProps: 'fontSize' });
@@ -494,7 +555,7 @@ export default function RevealAnimations() {
             }
           }
         },
-        { root: canvasViewport ?? null, threshold: [0.2, 0.35] }
+        { root: observerRoot, threshold: [0.2, 0.35] }
       );
       aboutObserver.observe(aboutSection);
     }
@@ -519,7 +580,7 @@ export default function RevealAnimations() {
             lowerCardsObserver?.unobserve(card);
           }
         },
-        { root: canvasViewport ?? null, threshold: [0.2, 0.35, 0.5] }
+        { root: observerRoot, threshold: [0.2, 0.35, 0.5] }
       );
       lowerCards.forEach((card) => lowerCardsObserver?.observe(card));
     }

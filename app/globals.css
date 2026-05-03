@@ -1882,6 +1882,28 @@ main {
   box-shadow: none;
 }
 
+@media (max-width: 1200px), (hover: none), (pointer: coarse) {
+  main {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .portfolio-canvas-shell {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .canvas-viewport {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+    touch-action: auto;
+    overscroll-behavior-y: auto;
+    user-select: auto;
+  }
+}
+
 .top-theme-button {
   position: fixed;
   top: 14px;
