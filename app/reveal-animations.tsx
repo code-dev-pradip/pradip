@@ -5,7 +5,6 @@ import { gsap } from 'gsap';
 
 export default function RevealAnimations() {
   useLayoutEffect(() => {
-    const mainEl = document.querySelector<HTMLElement>('main.intro-prereveal');
     const chipLoopTimelines: gsap.core.Timeline[] = [];
     const chipLoopDelays: gsap.core.Tween[] = [];
     const activeChipPositions: Array<{ x: number; y: number } | null> = [];
@@ -30,7 +29,6 @@ export default function RevealAnimations() {
     for (let i = 0; i < visibleHeroChips.length; i += 1) activeChipPositions.push(null);
 
     if (!navbar || !hero || !heroEyebrow || !heroTitle || !heroCopy || !heroButton) {
-      mainEl?.classList.remove('intro-prereveal');
       return;
     }
     const htmlEl = document.documentElement;
@@ -54,7 +52,6 @@ export default function RevealAnimations() {
     const observerRoot = hasInnerScroller ? canvasViewport : null;
 
     if (introAlreadyPlayed) {
-      mainEl?.classList.remove('intro-prereveal');
       gsap.set([navbar, heroEyebrow, heroTitle, heroCopy, heroButton], {
         clearProps: 'transform,opacity,visibility,filter'
       });
@@ -131,9 +128,6 @@ export default function RevealAnimations() {
       scale: 2.15
     });
     gsap.set(hiddenHeroChips, { autoAlpha: 0, display: 'none' });
-
-    // Hand off visibility control to GSAP to avoid class-based hide/show flicker.
-    mainEl?.classList.remove('intro-prereveal');
 
     heroCloud?.classList.remove('is-orbiting');
     for (const node of heroMainNodes) {
@@ -502,7 +496,6 @@ export default function RevealAnimations() {
 
       timeline.add(() => {
         htmlEl.dataset.introPlayed = '1';
-        mainEl?.classList.remove('intro-prereveal');
       }, '-=0.02');
 
       timeline.add(() => {
@@ -520,6 +513,14 @@ export default function RevealAnimations() {
       }, '-=0.16');
 
       timeline.set(visibleHeroChips, { clearProps: 'fontSize' });
+      timeline.set([navbar, heroEyebrow, heroCopy, heroButton], {
+        clearProps: 'transform,opacity,visibility,filter'
+      });
+      if (heroSplitChars.length > 0) {
+        timeline.set(heroSplitChars, { clearProps: 'transform,opacity,filter' });
+      } else {
+        timeline.set(heroTitle, { clearProps: 'transform,opacity,visibility,filter' });
+      }
     };
 
     let aboutAnimated = false;
@@ -597,7 +598,6 @@ export default function RevealAnimations() {
     const rafId = window.requestAnimationFrame(playReveal);
 
     return () => {
-      mainEl?.classList.remove('intro-prereveal');
       unlockScroll();
       aboutObserver?.disconnect();
       lowerCardsObserver?.disconnect();

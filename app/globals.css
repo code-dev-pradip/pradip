@@ -1019,7 +1019,7 @@ footer h2,
 
 .draggable-project-card {
   position: absolute;
-  cursor: grab;
+  cursor: pointer;
   touch-action: pan-y;
   user-select: none;
   transition: transform 180ms ease, box-shadow 180ms ease;
@@ -1033,14 +1033,6 @@ footer h2,
 
 .project-board.is-drop-started:not(.is-drop-settled) .draggable-project-card {
   will-change: transform, opacity;
-}
-
-.draggable-project-card.is-dragging {
-  will-change: transform;
-}
-
-.draggable-project-card:active {
-  cursor: grabbing;
 }
 
 .draggable-project-card a {
@@ -1057,8 +1049,7 @@ footer h2,
 }
 
 .draggable-project-card:hover a,
-.draggable-project-card.is-hovered a,
-.draggable-project-card.is-dragging a {
+.draggable-project-card.is-hovered a {
   box-shadow: 0 20px 38px rgba(2, 4, 12, 0.3);
   border-color: var(--line-strong);
 }
@@ -1117,8 +1108,7 @@ footer h2,
 }
 
 .draggable-project-card:hover .project-hover-pill,
-.draggable-project-card.is-hovered .project-hover-pill,
-.draggable-project-card.is-dragging .project-hover-pill {
+.draggable-project-card.is-hovered .project-hover-pill {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
 }
@@ -1781,8 +1771,7 @@ h1 {
 }
 
 .draggable-project-card:hover a,
-.draggable-project-card.is-hovered a,
-.draggable-project-card.is-dragging a {
+.draggable-project-card.is-hovered a {
   border-color: #f37b75;
   box-shadow: 0 16px 32px var(--shadow);
 }
@@ -1981,15 +1970,6 @@ main {
 .floating-center-nav nav a:active,
 .floating-center-nav-brand:active {
   transform: none;
-}
-
-.intro-prereveal .floating-center-nav,
-.intro-prereveal .node-hero .canvas-eyebrow,
-.intro-prereveal .node-hero .canvas-title,
-.intro-prereveal .node-hero .canvas-copy,
-.intro-prereveal .node-hero .eye-follow-button {
-  opacity: 0;
-  visibility: hidden;
 }
 
 .canvas-world {

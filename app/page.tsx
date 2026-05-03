@@ -14,7 +14,7 @@ import {
 
 export default function HomePage() {
   return (
-    <main className="intro-prereveal">
+    <main>
       <KentoBackground />
       <RevealAnimations />
       <div className="grain" />
