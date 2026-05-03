@@ -220,7 +220,13 @@ export default function NonlinearPortfolioCanvas({
 
       event.preventDefault();
       const scroller = document.querySelector<HTMLElement>('.canvas-viewport');
-      if (scroller) {
+      const canUseInnerScroller = Boolean(
+        scroller &&
+          scroller.scrollHeight > scroller.clientHeight + 2 &&
+          getComputedStyle(scroller).overflowY !== 'visible'
+      );
+
+      if (scroller && canUseInnerScroller) {
         const scrollerRect = scroller.getBoundingClientRect();
         const targetRect = target.getBoundingClientRect();
         const nextTop = targetRect.top - scrollerRect.top + scroller.scrollTop - NAV_OFFSET;

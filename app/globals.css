@@ -1871,6 +1871,8 @@ main {
   width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -1968,6 +1970,15 @@ main {
   border-color: var(--line-strong);
   background: var(--surface-strong);
   transform: translateY(-1px);
+}
+
+.intro-prereveal .floating-center-nav,
+.intro-prereveal .node-hero .canvas-eyebrow,
+.intro-prereveal .node-hero .canvas-title,
+.intro-prereveal .node-hero .canvas-copy,
+.intro-prereveal .node-hero .eye-follow-button {
+  opacity: 0;
+  visibility: hidden;
 }
 
 .canvas-world {
@@ -2595,9 +2606,23 @@ html[data-theme='dark'] .canvas-socials a,
 }
 
 @media (max-width: 920px) {
+  main {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
   .portfolio-canvas-shell {
-    height: 100svh;
+    height: auto;
+    min-height: 100svh;
     padding: 0;
+  }
+
+  .canvas-viewport {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+    overscroll-behavior-y: auto;
   }
 
   .canvas-world {

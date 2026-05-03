@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 
 export default function RevealAnimations() {
   useEffect(() => {
+    const mainEl = document.querySelector<HTMLElement>('main.intro-prereveal');
     const chipLoopTimelines: gsap.core.Timeline[] = [];
     const chipLoopDelays: gsap.core.Tween[] = [];
     const activeChipPositions: Array<{ x: number; y: number } | null> = [];
@@ -28,7 +29,10 @@ export default function RevealAnimations() {
     const hiddenHeroChips = heroMainChips.slice(6);
     for (let i = 0; i < visibleHeroChips.length; i += 1) activeChipPositions.push(null);
 
-    if (!navbar || !hero || !heroEyebrow || !heroTitle || !heroCopy || !heroButton) return;
+    if (!navbar || !hero || !heroEyebrow || !heroTitle || !heroCopy || !heroButton) {
+      mainEl?.classList.remove('intro-prereveal');
+      return;
+    }
     const htmlEl = document.documentElement;
     const bodyEl = document.body;
     const prevHtmlOverflow = htmlEl.style.overflow;
@@ -36,6 +40,7 @@ export default function RevealAnimations() {
     const prevBodyTouchAction = bodyEl.style.touchAction;
     const prevViewportOverflowY = canvasViewport?.style.overflowY ?? '';
     const prevViewportTouchAction = canvasViewport?.style.touchAction ?? '';
+    const shouldLockScroll = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
     type SplitTextEntry = {
       el: HTMLElement;
@@ -117,6 +122,7 @@ export default function RevealAnimations() {
     let isScrollLocked = false;
 
     const lockScroll = () => {
+      if (!shouldLockScroll) return;
       if (isScrollLocked) return;
       isScrollLocked = true;
       htmlEl.style.overflow = 'hidden';
@@ -129,6 +135,7 @@ export default function RevealAnimations() {
     };
 
     const unlockScroll = () => {
+      if (!shouldLockScroll) return;
       if (!isScrollLocked) return;
       isScrollLocked = false;
       htmlEl.style.overflow = prevHtmlOverflow;
@@ -155,14 +162,52 @@ export default function RevealAnimations() {
       return zones;
     };
 
+    const getMobileHeroSlots = (chip: HTMLElement) => {
+      const heroRect = hero.getBoundingClientRect();
+      const navBottom = navbar.getBoundingClientRect().bottom - heroRect.top;
+      const chipRect = chip.getBoundingClientRect();
+      const chipHalfW = chipRect.width * 0.5;
+      const chipHalfH = chipRect.height * 0.5;
+
+      const xPad = Math.max(chipHalfW + 14, Math.min(heroRect.width * 0.16, 96));
+      const leftX = xPad;
+      const centerX = heroRect.width * 0.5;
+      const rightX = heroRect.width - xPad;
+
+      const topMin = navBottom + chipHalfH + 18;
+      const topY = Math.max(topMin, heroRect.height * 0.22);
+      const bottomMax = heroRect.height - chipHalfH - 18;
+      const bottomY = Math.min(bottomMax, heroRect.height * 0.84);
+
+      return [
+        { x: leftX, y: topY },
+        { x: centerX, y: topY },
+        { x: rightX, y: topY },
+        { x: leftX, y: bottomY },
+        { x: centerX, y: bottomY },
+        { x: rightX, y: bottomY }
+      ];
+    };
+
     const getRandomHeroPoint = (chip: HTMLElement, chipIndex: number) => {
       const heroRect = hero.getBoundingClientRect();
       const isMobile = window.matchMedia('(max-width: 920px)').matches;
+      if (isMobile) {
+        const slots = getMobileHeroSlots(chip);
+        const slot = slots[chipIndex % slots.length];
+        return {
+          x: slot.x - heroRect.width * 0.5,
+          y: slot.y - heroRect.height * 0.5,
+          localX: slot.x,
+          localY: slot.y
+        };
+      }
+
       const zones = getNoPopZones();
       const chipRect = chip.getBoundingClientRect();
       const chipRadius = Math.max(52, Math.max(chipRect.width, chipRect.height) * 0.54);
-      const spacing = isMobile ? 170 : 300;
-      const edgePad = isMobile ? 34 : 58;
+      const spacing = 300;
+      const edgePad = 58;
       let best = { x: heroRect.width * 0.5, y: heroRect.height * 0.5 };
       let bestScore = -1;
 
@@ -211,20 +256,21 @@ export default function RevealAnimations() {
       return {
         x: best.x - heroRect.width * 0.5,
         y: best.y - heroRect.height * 0.5,
-        absoluteX: heroRect.left + best.x,
-        absoluteY: heroRect.top + best.y
+        localX: best.x,
+        localY: best.y
       };
     };
 
     const spawnChipPopLoop = (chip: HTMLElement, delay: number, chipIndex: number) => {
       const run = () => {
+        const isMobile = window.matchMedia('(max-width: 920px)').matches;
         const point = getRandomHeroPoint(chip, chipIndex);
-        activeChipPositions[chipIndex] = { x: point.absoluteX, y: point.absoluteY };
+        activeChipPositions[chipIndex] = { x: point.localX, y: point.localY };
 
         gsap.set(chip, {
           x: point.x,
           y: point.y,
-          scale: 0.78,
+          scale: isMobile ? 0.86 : 0.78,
           autoAlpha: 0,
           filter: 'blur(5px)'
         });
@@ -233,7 +279,10 @@ export default function RevealAnimations() {
           defaults: { ease: 'power2.out' },
           onComplete: () => {
             activeChipPositions[chipIndex] = null;
-            chipLoopDelays.push(gsap.delayedCall(gsap.utils.random(1.2, 2.2), run));
+            const wait = isMobile
+              ? Math.max(0.7, visibleHeroChips.length * 0.58)
+              : gsap.utils.random(1.2, 2.2);
+            chipLoopDelays.push(gsap.delayedCall(wait, run));
           }
         });
 
@@ -242,15 +291,15 @@ export default function RevealAnimations() {
             autoAlpha: 1,
             scale: 1,
             filter: 'blur(0px)',
-            duration: 0.8,
+            duration: isMobile ? 0.72 : 0.8,
             ease: 'power2.out'
           })
           .to(chip, {
             autoAlpha: 0,
-            scale: 0.84,
+            scale: isMobile ? 0.88 : 0.84,
             filter: 'blur(3px)',
-            duration: 0.9,
-            delay: gsap.utils.random(1.6, 2.6),
+            duration: isMobile ? 0.78 : 0.9,
+            delay: isMobile ? 1.28 : gsap.utils.random(1.6, 2.6),
             ease: 'power2.in'
           });
 
@@ -385,12 +434,17 @@ export default function RevealAnimations() {
       }, '+=0');
 
       timeline.add(() => {
+        mainEl?.classList.remove('intro-prereveal');
+      }, '-=0.02');
+
+      timeline.add(() => {
         heroCloud?.classList.remove('is-orbiting');
         for (const node of heroMainNodes) {
           gsap.set(node, { '--orbit-radius-current': '0px', '--tech-angle-current': '0deg' });
         }
         visibleHeroChips.forEach((chip, index) => {
-          spawnChipPopLoop(chip, index * 0.36, index);
+          const isMobile = window.matchMedia('(max-width: 920px)').matches;
+          spawnChipPopLoop(chip, index * (isMobile ? 0.62 : 0.36), index);
         });
       }, '-=0.16');
 
@@ -473,6 +527,7 @@ export default function RevealAnimations() {
     const rafId = window.requestAnimationFrame(playReveal);
 
     return () => {
+      mainEl?.classList.remove('intro-prereveal');
       unlockScroll();
       aboutObserver?.disconnect();
       lowerCardsObserver?.disconnect();
