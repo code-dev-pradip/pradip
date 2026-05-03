@@ -1910,6 +1910,36 @@ main {
   gap: 8px;
 }
 
+.floating-center-nav-brand {
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface-soft) 72%, transparent);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 180ms ease, transform 180ms ease, background-color 180ms ease;
+}
+
+.floating-center-nav-brand:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-strong);
+  transform: translateY(-1px);
+}
+
+.floating-center-nav-brand svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 .floating-center-nav nav a {
   color: var(--text);
   text-decoration: none;
@@ -2093,7 +2123,7 @@ main {
 
 .node-cap-experience {
   width: min(860px, 100%);
-  margin-top: 6px;
+  margin-top: 80px;
 }
 
 .node-cap-experience h2 {
@@ -2129,10 +2159,12 @@ main {
 
 .node-certs {
   width: min(860px, 100%);
+  margin-top: 40px;
 }
 
 .node-contact {
   width: min(860px, 100%);
+  margin-top: 40px;
 }
 
 .canvas-card-head {
@@ -2626,6 +2658,12 @@ html[data-theme='dark'] .canvas-socials a,
     gap: 32px;
   }
 
+  .node-cap-experience,
+  .node-certs,
+  .node-contact {
+    margin-top: 20px;
+  }
+
   .about-free-note {
     padding: 40px 20px 30px;
     width: min(660px, 96%);
@@ -2708,6 +2746,17 @@ html[data-theme='dark'] .canvas-socials a,
   }
 
   .floating-center-nav .theme-toggle .theme-toggle-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  .floating-center-nav-brand {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+
+  .floating-center-nav-brand svg {
     width: 14px;
     height: 14px;
   }

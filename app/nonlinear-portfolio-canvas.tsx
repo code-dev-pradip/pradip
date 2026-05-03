@@ -207,6 +207,8 @@ export default function NonlinearPortfolioCanvas({
   );
 
   useEffect(() => {
+    const NAV_OFFSET = 40;
+
     const onNavClick = (event: Event) => {
       const trigger = event.target as HTMLElement | null;
       const link = trigger?.closest('a[href^="#"]') as HTMLAnchorElement | null;
@@ -217,7 +219,17 @@ export default function NonlinearPortfolioCanvas({
       if (!target) return;
 
       event.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const scroller = document.querySelector<HTMLElement>('.canvas-viewport');
+      if (scroller) {
+        const scrollerRect = scroller.getBoundingClientRect();
+        const targetRect = target.getBoundingClientRect();
+        const nextTop = targetRect.top - scrollerRect.top + scroller.scrollTop - NAV_OFFSET;
+        scroller.scrollTo({ top: Math.max(0, nextTop), behavior: 'smooth' });
+        return;
+      }
+
+      const nextTop = target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET;
+      window.scrollTo({ top: Math.max(0, nextTop), behavior: 'smooth' });
     };
     document.addEventListener('click', onNavClick);
     return () => document.removeEventListener('click', onNavClick);
@@ -248,9 +260,9 @@ export default function NonlinearPortfolioCanvas({
             </div>
 
             <p className="canvas-eyebrow">Frontend Developer</p>
-            <h1 className="canvas-title">I craft high-performance websites with premium interaction and motion.</h1>
+            <h1 className="canvas-title">I Build Motion-Driven Web Experiences</h1>
             <p className="canvas-copy">
-              Building conversion-ready experiences with Webflow, Three.js, GSAP, and custom animation systems.
+              Frontend developer specializing in Next.js, React, Webflow, GSAP, and Three.js for SaaS, AI, and high-growth technology companies.
             </p>
             <EyeFollowButton href={`mailto:${profile.email}`} label="Get in touch" />
           </article>
