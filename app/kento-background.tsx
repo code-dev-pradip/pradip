@@ -15,7 +15,7 @@ export default function KentoBackground() {
 
   useEffect(() => {
     const media = window.matchMedia('(pointer: fine) and (hover: hover)');
-    if (!media.matches) return;
+    const isFinePointer = () => media.matches;
 
     const state = {
       tx: window.innerWidth * 0.5,
@@ -23,7 +23,8 @@ export default function KentoBackground() {
       x: window.innerWidth * 0.5,
       y: window.innerHeight * 0.5,
       visible: false,
-      interactive: false
+      interactive: false,
+      hideTimer: 0 as number | 0
     };
 
     let rafId = 0;
@@ -43,15 +44,44 @@ export default function KentoBackground() {
       cursorRef.current?.classList.toggle('is-link', interactive);
     };
 
+    const scheduleTouchHide = () => {
+      if (state.hideTimer) {
+        window.clearTimeout(state.hideTimer);
+      }
+      state.hideTimer = window.setTimeout(() => {
+        setVisible(false);
+        setInteractive(false);
+      }, 520);
+    };
+
     const onPointerMove = (event: PointerEvent) => {
       state.tx = event.clientX;
       state.ty = event.clientY;
-      const target = event.target as Element | null;
-      const interactive = Boolean(
-        target?.closest?.('a, button, [role="button"], input, textarea, select, summary, label')
-      );
-      setInteractive(interactive);
+      if (isFinePointer()) {
+        const target = event.target as Element | null;
+        const interactive = Boolean(
+          target?.closest?.('a, button, [role="button"], input, textarea, select, summary, label')
+        );
+        setInteractive(interactive);
+      } else {
+        setInteractive(false);
+        scheduleTouchHide();
+      }
       setVisible(true);
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      if (!touch) return;
+      state.tx = touch.clientX;
+      state.ty = touch.clientY;
+      setInteractive(false);
+      setVisible(true);
+      scheduleTouchHide();
+    };
+
+    const onTouchEnd = () => {
+      scheduleTouchHide();
     };
 
     const onPointerLeave = () => {
@@ -84,6 +114,10 @@ export default function KentoBackground() {
     };
 
     window.addEventListener('pointermove', onPointerMove, { passive: true });
+    window.addEventListener('touchstart', onTouchMove, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', onTouchEnd, { passive: true });
     window.addEventListener('pointerleave', onPointerLeave);
     window.addEventListener('blur', onPointerLeave);
 
@@ -91,7 +125,14 @@ export default function KentoBackground() {
 
     return () => {
       window.cancelAnimationFrame(rafId);
+      if (state.hideTimer) {
+        window.clearTimeout(state.hideTimer);
+      }
       window.removeEventListener('pointermove', onPointerMove);
+      window.removeEventListener('touchstart', onTouchMove);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
       window.removeEventListener('pointerleave', onPointerLeave);
       window.removeEventListener('blur', onPointerLeave);
     };

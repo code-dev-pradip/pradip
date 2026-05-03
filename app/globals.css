@@ -77,6 +77,8 @@ body {
   margin: 0;
   padding: 0;
   min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 body {
@@ -1854,54 +1856,34 @@ footer p {
 
 /* Non-linear canvas mode */
 main {
-  height: 100svh;
-  overflow: hidden;
+  height: auto;
+  min-height: 100svh;
+  overflow: visible;
   padding-top: 0;
   padding-bottom: 0;
 }
 
 .portfolio-canvas-shell {
-  height: 100svh;
+  height: auto;
+  min-height: 100svh;
   width: 100vw;
   padding: 0;
 }
 
 .canvas-viewport {
-  height: 100%;
+  height: auto;
+  min-height: 100svh;
   width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: visible;
   -webkit-overflow-scrolling: touch;
-  overscroll-behavior-y: contain;
+  overscroll-behavior-y: auto;
   border: 0;
   border-radius: 0;
   background: transparent;
   cursor: default;
-  user-select: none;
-  touch-action: pan-y;
+  user-select: auto;
+  touch-action: auto;
   box-shadow: none;
-}
-
-@media (max-width: 1200px), (hover: none), (pointer: coarse) {
-  main {
-    height: auto;
-    min-height: 100svh;
-    overflow: visible;
-  }
-
-  .portfolio-canvas-shell {
-    height: auto;
-    min-height: 100svh;
-  }
-
-  .canvas-viewport {
-    height: auto;
-    min-height: 100svh;
-    overflow: visible;
-    touch-action: auto;
-    overscroll-behavior-y: auto;
-    user-select: auto;
-  }
 }
 
 .top-theme-button {
@@ -1951,7 +1933,7 @@ main {
 .floating-center-nav-brand:hover {
   border-color: var(--line-strong);
   background: var(--surface-strong);
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .floating-center-nav-brand svg {
@@ -1991,7 +1973,14 @@ main {
 .floating-center-nav nav a:hover {
   border-color: var(--line-strong);
   background: var(--surface-strong);
-  transform: translateY(-1px);
+  transform: none;
+}
+
+.floating-center-nav .theme-toggle:hover,
+.floating-center-nav .theme-toggle:active,
+.floating-center-nav nav a:active,
+.floating-center-nav-brand:active {
+  transform: none;
 }
 
 .intro-prereveal .floating-center-nav,
@@ -2955,13 +2944,6 @@ body {
   body,
   body * {
     cursor: none !important;
-  }
-}
-
-@media (pointer: coarse), (hover: none) {
-  .kento-cursor,
-  .kento-trail {
-    display: none;
   }
 }
 

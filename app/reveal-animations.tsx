@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 import { gsap } from 'gsap';
 
 export default function RevealAnimations() {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mainEl = document.querySelector<HTMLElement>('main.intro-prereveal');
     const chipLoopTimelines: gsap.core.Timeline[] = [];
     const chipLoopDelays: gsap.core.Tween[] = [];
@@ -40,7 +40,9 @@ export default function RevealAnimations() {
     const prevBodyTouchAction = bodyEl.style.touchAction;
     const prevViewportOverflowY = canvasViewport?.style.overflowY ?? '';
     const prevViewportTouchAction = canvasViewport?.style.touchAction ?? '';
-    const shouldLockScroll = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const shouldLockScroll =
+      window.matchMedia('(hover: hover) and (pointer: fine)').matches && window.innerWidth > 1200;
+    const introAlreadyPlayed = htmlEl.dataset.introPlayed === '1';
     const isTouchOrTablet = window.matchMedia(
       '(max-width: 1200px), (hover: none), (pointer: coarse)'
     ).matches;
@@ -50,6 +52,14 @@ export default function RevealAnimations() {
         canvasViewport.scrollHeight > canvasViewport.clientHeight + 2
     );
     const observerRoot = hasInnerScroller ? canvasViewport : null;
+
+    if (introAlreadyPlayed) {
+      mainEl?.classList.remove('intro-prereveal');
+      gsap.set([navbar, heroEyebrow, heroTitle, heroCopy, heroButton], {
+        clearProps: 'transform,opacity,visibility,filter'
+      });
+      return;
+    }
 
     type SplitTextEntry = {
       el: HTMLElement;
@@ -121,6 +131,9 @@ export default function RevealAnimations() {
       scale: 2.15
     });
     gsap.set(hiddenHeroChips, { autoAlpha: 0, display: 'none' });
+
+    // Hand off visibility control to GSAP to avoid class-based hide/show flicker.
+    mainEl?.classList.remove('intro-prereveal');
 
     heroCloud?.classList.remove('is-orbiting');
     for (const node of heroMainNodes) {
@@ -289,8 +302,8 @@ export default function RevealAnimations() {
           onComplete: () => {
             activeChipPositions[chipIndex] = null;
             const wait = isMobile
-              ? Math.max(0.7, visibleHeroChips.length * 0.58)
-              : gsap.utils.random(1.2, 2.2);
+              ? Math.max(0.48, visibleHeroChips.length * 0.42)
+              : gsap.utils.random(0.8, 1.4);
             chipLoopDelays.push(gsap.delayedCall(wait, run));
           }
         });
@@ -300,15 +313,15 @@ export default function RevealAnimations() {
             autoAlpha: 1,
             scale: 1,
             filter: 'blur(0px)',
-            duration: isMobile ? 0.72 : 0.8,
+            duration: isMobile ? 0.56 : 0.62,
             ease: 'power2.out'
           })
           .to(chip, {
             autoAlpha: 0,
             scale: isMobile ? 0.88 : 0.84,
             filter: 'blur(3px)',
-            duration: isMobile ? 0.78 : 0.9,
-            delay: isMobile ? 1.28 : gsap.utils.random(1.6, 2.6),
+            duration: isMobile ? 0.62 : 0.72,
+            delay: isMobile ? 0.82 : gsap.utils.random(1.0, 1.8),
             ease: 'power2.in'
           });
 
@@ -341,7 +354,7 @@ export default function RevealAnimations() {
           onComplete: () => {
             activeChipPositions[chipIndex] = null;
             sequenceIndex += 1;
-            chipLoopDelays.push(gsap.delayedCall(0.18, run));
+            chipLoopDelays.push(gsap.delayedCall(0.08, run));
           }
         });
 
@@ -350,14 +363,14 @@ export default function RevealAnimations() {
             autoAlpha: 1,
             scale: 1,
             filter: 'blur(0px)',
-            duration: 0.72
+            duration: 0.56
           })
           .to(chip, {
             autoAlpha: 0,
             scale: 0.88,
             filter: 'blur(3px)',
-            duration: 0.78,
-            delay: 1.18,
+            duration: 0.62,
+            delay: 0.82,
             ease: 'power2.in'
           });
 
@@ -438,15 +451,13 @@ export default function RevealAnimations() {
       timeline.to(navbar, {
         y: 0,
         autoAlpha: 1,
-        duration: 0.7,
-        clearProps: 'transform,opacity,visibility'
+        duration: 0.7
       });
 
       timeline.to(heroEyebrow, {
         y: 0,
         autoAlpha: 1,
-        duration: 0.56,
-        clearProps: 'transform,opacity,visibility'
+        duration: 0.56
       }, '-=0.24');
 
       if (heroSplitChars.length > 0) {
@@ -468,8 +479,7 @@ export default function RevealAnimations() {
           {
             y: 0,
             autoAlpha: 1,
-            duration: 0.72,
-            clearProps: 'transform,opacity,visibility'
+            duration: 0.72
           },
           '-=0.22'
         );
@@ -481,8 +491,7 @@ export default function RevealAnimations() {
           y: 0,
           autoAlpha: 1,
           duration: 0.66,
-          stagger: 0.16,
-          clearProps: 'transform,opacity,visibility'
+          stagger: 0.16
         },
         '-=0.14'
       );
@@ -492,6 +501,7 @@ export default function RevealAnimations() {
       }, '+=0');
 
       timeline.add(() => {
+        htmlEl.dataset.introPlayed = '1';
         mainEl?.classList.remove('intro-prereveal');
       }, '-=0.02');
 
@@ -504,7 +514,7 @@ export default function RevealAnimations() {
           startMobileChipSequence();
         } else {
           visibleHeroChips.forEach((chip, index) => {
-            spawnChipPopLoop(chip, index * 0.36, index);
+            spawnChipPopLoop(chip, index * 0.24, index);
           });
         }
       }, '-=0.16');
@@ -574,8 +584,7 @@ export default function RevealAnimations() {
               y: 0,
               autoAlpha: 1,
               duration: 0.72,
-              ease: 'power3.out',
-              clearProps: 'transform,opacity,visibility'
+              ease: 'power3.out'
             });
             lowerCardsObserver?.unobserve(card);
           }
