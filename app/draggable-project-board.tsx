@@ -116,7 +116,12 @@ export default function DraggableProjectBoard({
       (visibilityTargetId ? document.getElementById(visibilityTargetId) : null) ??
       board.closest('.node-projects') ??
       board;
-    const rootScroller = board.closest('.canvas-viewport');
+    const rootScroller = board.closest('.canvas-viewport') as HTMLElement | null;
+    const canUseInnerScroller = Boolean(
+      rootScroller &&
+        getComputedStyle(rootScroller).overflowY !== 'visible' &&
+        rootScroller.scrollHeight > rootScroller.clientHeight + 2
+    );
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -126,7 +131,7 @@ export default function DraggableProjectBoard({
         }
       },
       {
-        root: rootScroller,
+        root: canUseInnerScroller ? rootScroller : null,
         threshold: 0.5
       }
     );
