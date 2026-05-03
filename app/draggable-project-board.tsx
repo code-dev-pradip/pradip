@@ -216,6 +216,8 @@ export default function DraggableProjectBoard({
     };
 
     const onTouchMove = (event: TouchEvent) => {
+      const drag = dragRef.current;
+      if (!drag) return;
       const point = getTouchPoint(event);
       if (!point) return;
       event.preventDefault();
